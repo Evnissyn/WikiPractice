@@ -1,0 +1,209 @@
+/****************************
+ * Getting Started CLI
+ ****************************
+
+git init	// set up git repo
+
+npm init	// set up package.json
+	"start": "nodemon -e html,js,css app.js"
+
+npm install dependencies
+	nodemon (dev)
+	volleyball / morgan
+	body-parser
+	express
+	nunjucks
+	sequelize
+	pg pg-hstore	// PostgreSQL
+
+createdb __database__
+
+folders:
+	models	// SQL table schemas
+	routes	// directing webpages
+	views	// webpage templates
+	public	// 'public' webpage directory
+
+app.js
+
+
+ */
+
+/******************************
+ * Basic app.js
+ * organized by npm package
+ ******************************/
+
+var express = require('express');
+	var app = express();
+	app.use(express.static('/public'));
+
+var volleyball = require('volleyball');
+	app.use(volleyball);
+
+var morgan = require('morgan');
+	app.use(morgan());
+
+var bodyparser = require('body-parser');
+
+
+var nunjucks = require('nunjucks');
+	var env = nunjucks.configure('view', {noCache: true});
+	app.set('view engine', 'html');
+	app.engine('html', nunjucks.render);
+
+var router = require('./routes/');
+	app.use('/__path__', router);
+
+var models = require('./models/');
+	models.__Struct__.sync({})
+	.then(function () {
+		return models.__OtherStruct__.sync({})
+	})
+	.then(function () {
+		app.listen(3001, function () {
+			console.log('Server is listening on port 3001!');
+		});
+	})
+	.catch(console.error);
+
+// page not found and error catching
+
+app.use(function(req, res, next){
+	var err = new Error('Not Found');
+	err.status = 404;
+	console.error(err);
+	next(err);
+});
+
+app.use(function(err, req, res, next){
+	res.status(err.status || 500);
+	console.error(err);
+	res.render('error', {err: err});
+});
+
+
+/******************************
+ * Basic app.js
+ * the way you'd probably want the file to look
+ ******************************/
+
+var express = require('express');
+var app = express();
+
+var volleyball = require('volleyball');
+// var morgan = require('morgan');
+var bodyparser = require('body-parser');
+var nunjucks = require('nunjucks');
+
+var router = require('./routes/');
+var models = require('./models/');
+
+var env = nunjucks.configure('view', {noCache: true});
+app.set('view engine', 'html');
+app.engine('html', nunjucks.render);
+
+app.use(volleyball);
+// app.use(morgan('dev'));
+app.use('/__path__', router);
+app.use(express.static('/public'));
+
+// not found middleware
+app.use(function(req, res, next){
+	var err = new Error('Not Found');
+	err.status = 404;
+	console.error(err);
+	next(err);
+});
+
+// error-handling middleware
+app.use(function(err, req, res, next){
+	res.status(err.status || 500);
+	console.error(err);
+	res.render('error', {err: err});
+});
+
+models.__Struct__.sync({})
+.then(function () {
+	return models.__OtherStruct__.sync({})
+	})
+	.then(function () {
+	app.listen(3001, function () {
+			console.log('Server is listening on port 3001!');
+			});
+			})
+	.catch(console.error);
+
+/******************************
+ * Basic js in routes folder
+ ******************************/
+
+var express = require('express');
+var router = express.Router();
+
+var bodyparser = require('body-parser');
+router.use(bodyparser.urlencoded({extended: true}));
+router.use(bodyparser.json());
+
+var models = require('__pathToModels__/models')
+var __Struct__ = models.__Struct__;
+
+module.exports = router;
+
+router.get('/__path__', function(request, response, next) {
+	response.send('__simpleMessage__');
+})
+
+router.get('/__otherPath__', function(request, response, next) {
+	response.render('__pageFromViews__');
+})
+
+router.post('/__pathFromHTMLForm__', function(request, response, next) {
+	var __newStruct__ = __Struct__.build({
+		__field__: request.body.__fieldNameFromHTML__,
+		__otherField__: request.body.__otherField__
+	});
+
+	__newStruct__.save()
+	.then(function() {
+		response.redirect('/__path__');
+	})
+})
+
+/******************************
+ * Basic js in models folder
+ ******************************/
+
+var Sequelize = require('sequelize');
+var db = new Sequelize('postgres://localhost:5432/__database__', {logging: false});
+
+var __Struct__ = db.define('__structTableName__', {
+	__field__: {
+		type: Sequelize.STRING, // (TEXT, INTEGER, ENUM, DATE ...)
+		allowNull: false,		// for required fields
+		defaultValue: Sequelize.NOW	// date
+	}
+}, {
+	getterMethods: {
+		__virtualField__: function() {return 'something'};
+	}
+});
+
+__Struct__.hook('beforeValidate', function(__newStruct__){
+	// set all not-allowed-null fields to not-null
+	return __newStruct__;
+})
+
+module.exports = {
+	__Struct__,
+	__OtherStruct__
+}
+
+
+/******************************
+ * HTML things
+ ******************************
+
+<form method="POST" action="/__pathToPost__"> ..... </form>
+
+ */

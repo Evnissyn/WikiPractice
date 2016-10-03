@@ -1,0 +1,15 @@
+{% extends "./layout.html" %}
+
+{% block content %}
+	<h1>"HI THERE</h1>
+	<h2>{{page.title}}<small> (<a href={{page.urlTitle}}>Similar</a>)</small></h2>
+	<h4>by <a href="user/{{user.id}}">{{user.name}}</a></h4>
+
+	<div>PLACEHOLDER TAG LIST</div>
+
+	<div class="page-body">{{page.content}}</div>
+
+	<a href="PLACEHOLDER_URL_TITLE/edit" class="btn btn-primary">edit this page</a>
+	<a href="PLACEHOLDER_URL_TITLE/delete" class="btn btn-danger">delete this page</a>
+
+{% endblock %}
