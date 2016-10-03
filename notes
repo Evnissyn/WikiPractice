@@ -4,6 +4,9 @@
 
 git init	// set up git repo
 
+echo 'node_modules/' > .gitignore
+		// git will ignore node_modules folder
+
 npm init	// set up package.json
 	"start": "nodemon -e html,js,css app.js"
 
@@ -25,7 +28,6 @@ folders:
 	public	// 'public' webpage directory
 
 app.js
-
 
  */
 
